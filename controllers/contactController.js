@@ -23,13 +23,24 @@ exports.getContactById = async (req, res) => {
 
 // ✅ Create a new contact
 exports.createContact = async (req, res) => {
+    console.log("POST /contacts called"); // Debugging step
+    console.log("Request body:", req.body); // Log request data
+
     const { firstName, lastName, email, favoriteColor, birthday } = req.body;
+
+    // Validate required fields
+    if (!firstName || !lastName || !email) {
+        console.log("Validation failed: Missing required fields"); // Debug log
+        return res.status(400).json({ message: "Missing required fields" });
+    }
 
     try {
         const contact = new Contact({ firstName, lastName, email, favoriteColor, birthday });
         const newContact = await contact.save();
+        console.log("New contact created:", newContact); // Debug log
         res.status(201).json(newContact);
     } catch (err) {
+        console.error("Error saving contact:", err); // Log error
         res.status(400).json({ message: err.message });
     }
 };
