@@ -11,12 +11,14 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:3410',
-                description: 'Local server',
-            },
-            {
+
                 url: 'https://cse341-contacts-mjay.onrender.com',
                 description: 'Production server',
+
+            },
+            {
+                url: 'http://localhost:3410',
+                description: 'Local server',
             }
         ],
         components: {
