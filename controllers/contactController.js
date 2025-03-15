@@ -4,7 +4,7 @@ const Contact = require('../models/Contact');
 exports.getAllContacts = async (req, res) => {
     try {
         const contacts = await Contact.find();
-        res.json(contacts);
+        res.status(200).json(contacts);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -14,8 +14,8 @@ exports.getAllContacts = async (req, res) => {
 exports.getContactById = async (req, res) => {
     try {
         const contact = await Contact.findById(req.params.id);
-        if (!contact) return res.status(404).json({ message: 'Contact not found' });
-        res.json(contact);
+        if (!contact) return res.status(404).json({ message: "Contact not found" });
+        res.status(200).json(contact);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -23,24 +23,18 @@ exports.getContactById = async (req, res) => {
 
 // ✅ Create a new contact
 exports.createContact = async (req, res) => {
-    console.log("POST /contacts called"); // Debugging step
-    console.log("Request body:", req.body); // Log request data
-
-    const { firstName, lastName, email, favoriteColor, birthday } = req.body;
-
-    // Validate required fields
-    if (!firstName || !lastName || !email) {
-        console.log("Validation failed: Missing required fields"); // Debug log
-        return res.status(400).json({ message: "Missing required fields" });
-    }
-
     try {
-        const contact = new Contact({ firstName, lastName, email, favoriteColor, birthday });
-        const newContact = await contact.save();
-        console.log("New contact created:", newContact); // Debug log
+        const { firstName, lastName, email, favoriteColor, birthday } = req.body;
+
+        if (!firstName || !lastName || !email) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        const newContact = new Contact({ firstName, lastName, email, favoriteColor, birthday });
+        await newContact.save();
+
         res.status(201).json(newContact);
     } catch (err) {
-        console.error("Error saving contact:", err); // Log error
         res.status(400).json({ message: err.message });
     }
 };
@@ -49,8 +43,8 @@ exports.createContact = async (req, res) => {
 exports.updateContact = async (req, res) => {
     try {
         const updatedContact = await Contact.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updatedContact) return res.status(404).json({ message: 'Contact not found' });
-        res.json(updatedContact);
+        if (!updatedContact) return res.status(404).json({ message: "Contact not found" });
+        res.status(200).json(updatedContact);
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
@@ -60,8 +54,8 @@ exports.updateContact = async (req, res) => {
 exports.deleteContact = async (req, res) => {
     try {
         const contact = await Contact.findByIdAndDelete(req.params.id);
-        if (!contact) return res.status(404).json({ message: 'Contact not found' });
-        res.json({ message: 'Contact deleted' });
+        if (!contact) return res.status(404).json({ message: "Contact not found" });
+        res.status(200).json({ message: "Contact deleted" });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

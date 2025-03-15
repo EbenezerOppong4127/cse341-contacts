@@ -11,10 +11,8 @@ const options = {
         },
         servers: [
             {
-
                 url: 'https://cse341-contacts-mjay.onrender.com',
                 description: 'Production server',
-
             },
             {
                 url: 'http://localhost:3410',
@@ -34,31 +32,31 @@ const options = {
                         },
                         firstName: {
                             type: 'string',
-                            example: 'Jane'
+                            description: 'First name of the contact'
                         },
                         lastName: {
                             type: 'string',
-                            example: 'Smith'
+                            description: 'Last name of the contact'
                         },
                         email: {
                             type: 'string',
                             format: 'email',
-                            example: 'janesmith@example.com'
+                            description: 'Email address of the contact'
                         },
                         favoriteColor: {
                             type: 'string',
-                            example: 'Green'
+                            description: 'Favorite color of the contact'
                         },
                         birthday: {
                             type: 'string',
                             format: 'date',
-                            example: '1985-07-22'
+                            description: 'Birthday in YYYY-MM-DD format',
+                            example: 'yy-mm-dd'
                         }
                     }
                 }
             }
         }
-
     },
     apis: ['./routes/*.js'],
 };

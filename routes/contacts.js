@@ -1,6 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const Contact = require('../models/Contact');
+const contactController = require('../controllers/contactController');
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Contact:
+ *       type: object
+ *       required:
+ *         - firstName
+ *         - lastName
+ *         - email
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: Unique identifier of the contact
+ *         firstName:
+ *           type: string
+ *           description: First name of the contact
+ *         lastName:
+ *           type: string
+ *           description: Last name of the contact
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Email address of the contact
+ *         favoriteColor:
+ *           type: string
+ *           description: Favorite color of the contact
+ *         birthday:
+ *           type: string
+ *           format: date
+ *           description: Birthday of the contact (YYYY-MM-DD)
+ */
 
 /**
  * @swagger
@@ -25,14 +58,32 @@ const Contact = require('../models/Contact');
  *               items:
  *                 $ref: '#/components/schemas/Contact'
  */
-router.get('/', async (req, res) => {
-    try {
-        const contacts = await Contact.find();
-        res.json(contacts);
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+router.get('/', contactController.getAllContacts);
+
+/**
+ * @swagger
+ * /contacts/{id}:
+ *   get:
+ *     summary: Get a contact by ID
+ *     tags: [Contacts]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Contact ID
+ *     responses:
+ *       200:
+ *         description: Contact found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Contact'
+ *       404:
+ *         description: Contact not found
+ */
+router.get('/:id', contactController.getContactById);
 
 /**
  * @swagger
@@ -52,30 +103,13 @@ router.get('/', async (req, res) => {
  *       400:
  *         description: Bad request (Validation Error)
  */
+router.post('/', contactController.createContact);
 
-router.post('/', async (req, res) => {
-    try {
-        const { firstName, lastName, email, favoriteColor, birthday } = req.body;
-
-        // ✅ Check if required fields are present
-        if (!firstName || !lastName || !email) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        // ✅ Create and save contact
-        const newContact = new Contact({ firstName, lastName, email, favoriteColor, birthday });
-        await newContact.save();
-
-        res.status(201).json(newContact);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
 /**
  * @swagger
  * /contacts/{id}:
- *   get:
- *     summary: Get a contact by ID
+ *   put:
+ *     summary: Update an existing contact
  *     tags: [Contacts]
  *     parameters:
  *       - in: path
@@ -84,21 +118,21 @@ router.post('/', async (req, res) => {
  *         schema:
  *           type: string
  *         description: Contact ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Contact'
  *     responses:
  *       200:
- *         description: Contact found
+ *         description: Contact updated successfully
  *       404:
  *         description: Contact not found
+ *       400:
+ *         description: Validation error
  */
-router.get('/:id', async (req, res) => {
-    try {
-        const contact = await Contact.findById(req.params.id);
-        if (!contact) return res.status(404).json({ error: 'Contact not found' });
-        res.json(contact);
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+router.put('/:id', contactController.updateContact);
 
 /**
  * @swagger
@@ -119,14 +153,6 @@ router.get('/:id', async (req, res) => {
  *       404:
  *         description: Contact not found
  */
-router.delete('/:id', async (req, res) => {
-    try {
-        const contact = await Contact.findByIdAndDelete(req.params.id);
-        if (!contact) return res.status(404).json({ error: 'Contact not found' });
-        res.json({ message: 'Contact deleted' });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+router.delete('/:id', contactController.deleteContact);
 
 module.exports = router;
